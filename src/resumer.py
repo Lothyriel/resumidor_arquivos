@@ -12,20 +12,19 @@ class Resumer:
             text = file.read()
 
         slice_size = 10000
-        print(file_name)
 
         for i in range(0, len(text), slice_size):
             slice_text = text[i:i+slice_size]
+            print(f'Slice original: {i} | {slice_text}')
 
             output_path = os.path.join("output", file_name)
-            print(output_path)
-            self.resume_slice(slice_text, output_path)
+            self.resume_slice(slice_text, output_path, i)
 
-    def resume_slice(self, slice_text, output_path):
+    def resume_slice(self, slice_text, output_path, i):
         response_chat_gpt = openai.ChatCompletion.create(
                 model="gpt-3.5-turbo",
                 messages=[
-                    {"role": "system", "content": "Você resume textos em português"},
+                    {"role": "system", "content": "Você resume textos em português de maneira objetiva"},
                     {"role": "user", "content": slice_text},
                 ]
             )
@@ -33,6 +32,8 @@ class Resumer:
         response = ''
         for choice in response_chat_gpt.choices:
             response += choice.message.content
+
+        print(f'Slice resumida: {i} | {response}')
 
         with open(output_path, 'a') as file:
             file.write(response)
